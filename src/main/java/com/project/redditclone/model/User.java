@@ -14,6 +14,19 @@ public class User{
     private String userPassword;
     private String userEmail;
     private Instant creationTime;
+    private boolean enabled;
+	/**
+	 * @return the enabled
+	 */
+	public boolean isEnabled() {
+		return enabled;
+	}
+	/**
+	 * @param enabled the enabled to set
+	 */
+	public void setEnabled(boolean enabled) {
+		this.enabled = enabled;
+	}
 	/**
 	 * @return the userName
 	 */
