@@ -1,7 +1,5 @@
 package com.project.redditclone.model;
 
-import jakarta.persistence.Entity;
-
 public class NotificationEmail {
 	private String emailSubject;
 	private String emailBody;
@@ -9,6 +7,11 @@ public class NotificationEmail {
 	/**
 	 * @return the emailSubject
 	 */
+	public NotificationEmail(String emailSubject, String emailBody, String emailRecepient) {
+		this.emailSubject = emailSubject;
+		this.emailBody = emailBody;
+		this.emailRecepient = emailRecepient;
+	}
 	public String getEmailSubject() {
 		return emailSubject;
 	}
