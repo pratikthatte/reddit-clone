@@ -1,9 +1,17 @@
 package com.project.redditclone.service;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+
 import java.util.Optional;
+
+import com.project.redditclone.dto.AuthenticationResponse;
+import com.project.redditclone.dto.LoginRequest;
 import com.project.redditclone.dto.RegisterRequest;
 import com.project.redditclone.exception.RedditErrorException;
 import com.project.redditclone.model.NotificationEmail;
@@ -11,6 +19,7 @@ import com.project.redditclone.model.User;
 import com.project.redditclone.model.VerificationToken;
 import com.project.redditclone.repository.UserRepository;
 import com.project.redditclone.repository.VerificationTokenRepository;
+import com.project.redditclone.security.JwtProvider;
 
 import java.time.Instant;
 import java.util.UUID;
@@ -21,13 +30,17 @@ public class AuthService {
 	private final VerificationTokenRepository verificationTokenRepository;
 	private final MailContentBuilder mailContentBuilder;
 	private final MailService mailService;
+	private final AuthenticationManager authenticationManager;
+	private final JwtProvider jwtProvider;
 	
-	public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder, VerificationTokenRepository verificationTokenRepository, MailContentBuilder mailContentBuilder, MailService mailService) {
+	public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder, VerificationTokenRepository verificationTokenRepository, MailContentBuilder mailContentBuilder, MailService mailService, AuthenticationManager authenticationManager, JwtProvider jwtProvider) {
 		this.userRepository = userRepository;
 		this.passwordEncoder = passwordEncoder;
 		this.verificationTokenRepository = verificationTokenRepository;
 		this.mailContentBuilder = mailContentBuilder;
 		this.mailService = mailService;
+		this.authenticationManager = authenticationManager;
+		this.jwtProvider = jwtProvider;
 	}
 
 	@Value("${ACTIVATION_EMAIL}")
@@ -75,6 +88,13 @@ public class AuthService {
 		user = userRepository.findByUserName(user.getUserName()).orElseThrow(() -> new RedditErrorException("Invalid username"));
 		user.setEnabled(true);
 		userRepository.save(user);
+	}
+
+	public AuthenticationResponse login(LoginRequest loginRequest) {
+		Authentication authenticate = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(),loginRequest.getPassword()));
+		SecurityContextHolder.getContext().setAuthentication(authenticate);
+		 String authenticationToken = jwtProvider.generateToken(authenticate);
+		 return new AuthenticationResponse(authenticationToken,loginRequest.getUsername());	 
 	}
 
 }
