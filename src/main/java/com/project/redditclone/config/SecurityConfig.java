@@ -11,16 +11,21 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+import com.project.redditclone.security.JwtAuthenticationFilter;
 
 @Configuration
 public class SecurityConfig {
 	
 	private final UserDetailsService userDetailsService;
 	private final PasswordEncoder passwordEncoder;
+	private final JwtAuthenticationFilter jwtAuthenticationFilter;
 	
-	public SecurityConfig(UserDetailsService userDetailsService, PasswordEncoder passwordEncoder) {
+	public SecurityConfig(UserDetailsService userDetailsService, PasswordEncoder passwordEncoder, JwtAuthenticationFilter jwtAuthenticationFilter) {
 		this.userDetailsService = userDetailsService;
 		this.passwordEncoder = passwordEncoder;
+		this.jwtAuthenticationFilter = jwtAuthenticationFilter;
 	}
 	@Bean(BeanIds.AUTHENTICATION_MANAGER)
 	public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception{
@@ -42,7 +47,7 @@ public class SecurityConfig {
 						.requestMatchers("api/auth/**")
 						.permitAll()
 						.anyRequest()
-						.authenticated());
+						.authenticated()).addFilter(new UsernamePasswordAuthenticationFilter()).addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 		return http.build();
 	}
 }
