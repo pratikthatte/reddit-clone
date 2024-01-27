@@ -20,6 +20,13 @@ public class Subreddit {
 	private String subredditName;
 	@ManyToOne
 	private User user;
+	
+	/**
+	 * @return the subredditId
+	 */
+	public long getSubredditId() {
+		return subredditId;
+	}
 	@OneToMany
 	private List<Post> posts;
 	/**
