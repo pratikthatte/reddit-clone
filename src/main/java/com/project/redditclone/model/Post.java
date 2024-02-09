@@ -16,6 +16,13 @@ public class Post {
 	private String postName;
 	private String postUrl;
 	private String postDescription;
+	
+	/**
+	 * @return the postId
+	 */
+	public long getPostId() {
+		return postId;
+	}
 	@ManyToOne
 	@JoinColumn(name="userId", referencedColumnName="userId")
 	private User user;
